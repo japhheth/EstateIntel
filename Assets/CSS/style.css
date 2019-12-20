@@ -1,9 +1,14 @@
 
-.head-bg{
-    background-color: #28394B;
+body{
+    margin: 0;
+    padding: 0;
+    background-color: #EEF5FB;
 }
 
 
+.head-bg{
+    background-color: #28394B;
+}
 
 .header-txt-col > th{
     color: #fff;
