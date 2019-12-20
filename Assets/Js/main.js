@@ -6,41 +6,44 @@ $(function(){
         type:"GET",
         contentType:"application/json",
         success:function(response){
-           // console.log(response)
+        
             let data = response.data;
-            $.each(data,(index,row)=>{
+            for(let i = 0; i < data.length; i++){
                 let status = "";
-                if(row.status == "On hold")
+                if(data[i].status == "On hold")
                 {
                     status = '<span class="badge badge-primary status-bg">On Hold</span>'
                 }
-                else if(row.status == "Site Clearing")
+                else if(data[i].status == "Site Clearing")
                 {
                     status = '<span class="badge badge-secondary status-bg">Site Clearing</span>'
                 }
-                else if(row.status == "Completed")
+                else if(data[i].status == "Completed")
                 {
                     status = '<span class="badge badge-success status-bg">Completed</span>'
 
                 }
-                else if(row.status == "Under construction")
+                else if(data[i].status == "Under construction")
                 {
                     status = '<span class="badge badge-warning status-bg">Under Construction</span>'
 
                 }
-                else if(row.status == "Conceptual")
+                else if(data[i].status == "Conceptual")
                 {
                     status = '<span class="badge badge-info status-bg">Conceptual</span>'
 
                 }
-                else if(row.status == "Implementation")
+                else if(data[i].status == "Implementation")
                 {
                     status = '<span class="badge badge-dark status-bg">Implementation</span>'
 
                 }
-               
-                tableBody += `<tr><td>${row.project_name}</td><td>${row.developer}</td><td>${row.main_contractor}</td><td>${row.lga}</td><td>${row.state}</td><td>${status}</td><td>${row.sector}</td></tr>`
-            })
+
+                tableBody += `<tr><td>${data[i].project_name}</td><td>${data[i].developer}</td><td>${data[i].main_contractor}</td><td>${data[i].lga}</td><td>${data[i].state}</td><td>${status}</td><td>${data[i].sector}</td></tr>`
+
+
+
+            }
             $('#tableBody').html(tableBody);
             $('#estateTable').DataTable();
         }
