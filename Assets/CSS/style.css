@@ -1,0 +1,28 @@
+
+.head-bg{
+    background-color: #28394B;
+}
+
+.nav-flex{
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-txt-col > th{
+    color: #fff;
+}
+
+.my-form{
+    position: relative;
+}
+
+.search-icon{
+    font-size: 17px;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: #CED4DA;
+}
+.status-bg{
+    padding: 10px 20px;
+}
