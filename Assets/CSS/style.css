@@ -3,10 +3,7 @@
     background-color: #28394B;
 }
 
-.nav-flex{
-    display: flex;
-    justify-content: space-between;
-}
+
 
 .header-txt-col > th{
     color: #fff;
@@ -25,6 +22,12 @@
 }
 .status-bg{
     padding: 10px 20px;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 768px){
+    .nav-flex{
+        justify-content: center
+    }
 }
 
 
