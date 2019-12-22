@@ -1,7 +1,7 @@
 let tableBody = '';
 
-//OnLoad function
 
+//OnLoad function
 $(function(){
 
     //Fetches the data
