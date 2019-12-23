@@ -4,9 +4,6 @@ body{
     padding: 0;
     background-color: #EEF5FB;
 }
-
-
-
 .head-bg{
     background-color: #28394B;
 }
@@ -19,13 +16,6 @@ body{
     position: relative;
 }
 
-.search-icon{
-    font-size: 17px;
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    color: #CED4DA;
-}
 .status-bg{
     padding: 10px 20px;
 }
