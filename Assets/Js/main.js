@@ -9,6 +9,7 @@ $(function(){
         type:"GET",
         contentType:"application/json",
         success:function(response){
+            console.log(response)
             let data = response.data;
 
             //Loops through the data and renders the table
