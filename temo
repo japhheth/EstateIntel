@@ -1,0 +1,1705 @@
+<template>
+  <jet-form-section @submitted="submit">
+    <template #title> Instructions</template>
+
+    <template #description>
+      <span>
+        Please complete all sections of this form to make it eligible for
+        processing.
+      </span>
+      <br />
+      <span>
+        {{ !form.type ? 'I / We' : form.type === 'IND' ? 'I' : 'We' }}
+        hereby request that henceforth, all
+        {{ !form.type ? 'my / our' : form.type === 'IND' ? 'my' : 'our' }}
+        Dividend Payment(s) due to
+        {{ !form.type ? 'me / us' : form.type === 'IND' ? 'me' : 'us' }}
+        from
+        {{ !form.type ? 'my / our' : form.type === 'IND' ? 'my' : 'our' }}
+        holdings on your records be credited directly to
+        {{ !form.type ? 'my / our' : form.type === 'IND' ? 'my' : 'our' }}
+        bank details below:
+      </span>
+    </template>
+
+    <template #form>
+      <div class="col-span-2">
+        <div class="flex flex-col md:flex-row">
+          <div class="w-full flex-1 flex flex-col justify-end">
+            <jet-label target="type"
+              >{{ showTabAndContent ? 'Account Type' : 'Select Account Type' }}
+              <jet-required />
+            </jet-label>
+            <jet-select
+              :disabled="form.processing"
+              :value="form.type"
+              v-model="form.type"
+              @blur="$v.form.type.$touch"
+              :error="errors.type || messages.type"
+              id="type"
+            >
+              <option disabled="disabled" selected="selected" value="">
+                Select
+              </option>
+              <option value="IND">Individual Account</option>
+              <option value="CORP">Corporate Account</option>
+              <option value="JOINT">Joint Account</option>
+            </jet-select>
+          </div>
+        </div>
+      </div>
+      <div class="tabs col-span-2" v-show="showTabAndContent">
+        <ul>
+          <li class="active">
+            <span class="text">KYC Information</span>
+          </li>
+          <li>
+            <span class="text">Bank Account Details</span>
+          </li>
+          <li>
+            <span class="text">Document Upload</span>
+          </li>
+        </ul>
+      </div>
+      <div class="content col-span-2" v-show="showTabAndContent">
+        <div class="tab_wrap" style="display: block">
+          <div class="tab_content grid grid-cols-2 gap-6">
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="surname"
+                    >{{
+                      !form.type
+                        ? 'Surname / Company Name'
+                        : form.type === 'CORP'
+                        ? 'Company Name'
+                        : 'Surname'
+                    }}
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.surname || messages.surname"
+                    class="block mt-1 w-full"
+                    id="surname"
+                    :label="
+                      !form.type
+                        ? 'Surname / Company Name'
+                        : form.type === 'CORP'
+                        ? 'Company Name'
+                        : 'Surname'
+                    "
+                    type="text"
+                    @input="$v.form.surname.$touch"
+                    @blur="$v.form.surname.$touch"
+                    v-model.trim="form.surname"
+                  />
+                </div>
+              </div>
+            </div>
+            <template v-if="form.type && form.type !== 'CORP'">
+              <div class="col-span-2 sm:col-span-1">
+                <div class="w-full flex-1 flex flex-col justify-end">
+                  <div>
+                    <jet-label target="first-name"
+                      >First Name
+                      <jet-required />
+                    </jet-label>
+                    <jet-input
+                      :disabled="form.processing"
+                      :error="errors.first_name || messages.first_name"
+                      class="block mt-1 w-full"
+                      id="first-name"
+                      label="First Name"
+                      type="text"
+                      @input="$v.form.first_name.$touch"
+                      @blur="$v.form.first_name.$touch"
+                      v-model.trim="form.first_name"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-span-2 sm:col-span-1">
+                <div class="w-full flex-1 flex flex-col justify-end">
+                  <div>
+                    <jet-label target="other-names">Other Names</jet-label>
+                    <jet-input
+                      :disabled="form.processing"
+                      :error="errors.other_names"
+                      class="block mt-1 w-full"
+                      id="other-names"
+                      label="Other Names"
+                      type="text"
+                      v-model.trim="form.other_names"
+                    />
+                  </div>
+                </div>
+              </div>
+            </template>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="address1"
+                    >Address Line 1
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.address1 || messages.address1"
+                    class="block mt-1 w-full"
+                    id="address1"
+                    label="Address Line 1"
+                    type="text"
+                    @input="$v.form.address1.$touch"
+                    @blur="$v.form.address1.$touch"
+                    v-model.trim="form.address1"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="address2">Address Line 2</jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.address2"
+                    class="block mt-1 w-full"
+                    id="address2"
+                    label="Address Line 2"
+                    type="text"
+                    v-model.trim="form.address2"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <jet-label target="country"
+                  >Address Country
+                  <jet-required />
+                </jet-label>
+                <jet-select
+                  :disabled="form.processing"
+                  :value="form.country_id"
+                  @input="onCountryChange"
+                  :error="errors.country || messages.country"
+                  @blur="$v.form.country.$touch"
+                  id="country"
+                >
+                  <option disabled="disabled" selected="selected" value="">
+                    Select
+                  </option>
+                  <option
+                    v-for="country in countries"
+                    :key="country.id"
+                    :value="country.id"
+                  >
+                    {{ country.name }}
+                  </option>
+                </jet-select>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <jet-label target="state"
+                  >Address State
+                  <jet-required />
+                </jet-label>
+                <jet-select
+                  :disabled="form.processing || !form.country_id"
+                  :value="form.state_id"
+                  @input="onStateChange"
+                  :error="errors.state || messages.state"
+                  @blur="$v.form.state.$touch"
+                  id="state"
+                >
+                  <option disabled="disabled" selected="selected" value="">
+                    Select
+                  </option>
+                  <option
+                    v-for="state in states"
+                    :key="state.id"
+                    :value="state.id"
+                  >
+                    {{ state.name }}
+                  </option>
+                  <option value="others">Other State</option>
+                </jet-select>
+              </div>
+            </div>
+            <div
+              class="col-span-2 sm:col-span-1"
+              v-if="form.state_id === 'others'"
+            >
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="other-state"
+                    >Address State
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.state || messages.state"
+                    class="block mt-1 w-full"
+                    id="other-state"
+                    label="Address State"
+                    type="text"
+                    @input="$v.form.state.$touch"
+                    @blur="$v.form.state.$touch"
+                    v-model.trim="form.state"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <jet-label target="city"
+                  >Address City
+                  <jet-required />
+                </jet-label>
+                <jet-select
+                  :disabled="form.processing || !form.state_id"
+                  :value="form.city_id"
+                  @input="onCityChange"
+                  :error="errors.city || messages.city"
+                  @blur="$v.form.city.$touch"
+                  id="city"
+                >
+                  <option disabled="disabled" selected="selected" value="">
+                    Select
+                  </option>
+                  <option
+                    v-for="city in cities"
+                    :key="city.id"
+                    :value="city.id"
+                  >
+                    {{ city.name }}
+                  </option>
+                  <option value="others">Other City</option>
+                </jet-select>
+              </div>
+            </div>
+            <div
+              class="col-span-2 sm:col-span-1"
+              v-if="form.city_id === 'others'"
+            >
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="other-city"
+                    >Address City
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.city || messages.city"
+                    class="block mt-1 w-full"
+                    id="other-city"
+                    label="Address City"
+                    type="text"
+                    @input="$v.form.city.$touch"
+                    @blur="$v.form.city.$touch"
+                    v-model.trim="form.city"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="previous-address"
+                    >Previous Address (if any)
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.previous_address"
+                    class="block mt-1 w-full"
+                    id="previous-address"
+                    label="Address Line 2"
+                    type="text"
+                    v-model.trim="form.previous_address"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="chn"
+                    >Clearing House Number (CHN)</jet-label
+                  >
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.chn"
+                    class="block mt-1 w-full"
+                    id="chn"
+                    label="Clearing House Number (CHN)"
+                    type="text"
+                    v-model.trim="form.chn"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="phone1">
+                    Mobile Phone 1
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.phone1 || messages.phone1"
+                    class="block mt-1 w-full"
+                    id="phone1"
+                    label="Mobile Phone 1"
+                    type="text"
+                    @input="$v.form.phone1.$touch"
+                    @blur="$v.form.phone1.$touch"
+                    v-model.trim="form.phone1"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="phone2">Mobile Phone 2</jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.phone2"
+                    class="block mt-1 w-full"
+                    id="phone2"
+                    label="Mobile Phone 2"
+                    type="text"
+                    v-model.trim="form.phone2"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="email">Email</jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.email || messages.email"
+                    class="block mt-1 w-full cursor-not-allowed"
+                    id="email"
+                    label="Email"
+                    type="email"
+                    @input="$v.form.email.$touch"
+                    @blur="$v.form.email.$touch"
+                    v-model.trim="form.email"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab_wrap" style="display: none">
+          <div class="tab_content grid grid-cols-2 gap-6">
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="account-name-one"
+                    >Bank Account Name
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="
+                      errors.bank_account_name || messages.bank_account_name
+                    "
+                    class="block mt-1 w-full"
+                    id="account-name-one"
+                    label="Bank Account Name*"
+                    type="text"
+                    @input="$v.form.bank_account_name.$touch"
+                    @blur="$v.form.bank_account_name.$touch"
+                    v-model.trim="form.bank_account_name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="account-number-one"
+                    >Bank Account Number
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="
+                      errors.bank_account_number || messages.bank_account_number
+                    "
+                    class="block mt-1 w-full"
+                    id="account-number-one"
+                    label="Bank Account Number*"
+                    min="1"
+                    type="number"
+                    @input="$v.form.bank_account_number.$touch"
+                    @blur="$v.form.bank_account_number.$touch"
+                    v-model.trim="form.bank_account_number"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="name-one"
+                    >Bank Name
+                    <jet-required />
+                  </jet-label>
+                  <jet-select
+                    :disabled="form.processing"
+                    :value="form.bank_short_code"
+                    :error="errors.bank_name || messages.bank_name"
+                    @input="
+                      val => {
+                        form.bank_short_code = val;
+                        if (val) {
+                          form.bank_name = banks.find(b => b.code === val).name;
+                        } else {
+                          form.bank_name = '';
+                        }
+                      }
+                    "
+                    @blur="$v.form.bank_name.$touch"
+                    id="name-one"
+                  >
+                    <option disabled="disabled" selected="selected" value="">
+                      Select
+                    </option>
+                    <option
+                      v-for="bank in banks"
+                      :key="bank.code"
+                      :value="bank.code"
+                      :data-long-code="bank.longCode"
+                    >
+                      {{ bank.name }}
+                    </option>
+                  </jet-select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+              <div class="w-full flex-1 flex flex-col justify-end">
+                <div>
+                  <jet-label target="bvn"
+                    >Bank Verification Number (BVN)
+                    <jet-required />
+                  </jet-label>
+                  <jet-input
+                    :disabled="form.processing"
+                    :error="errors.bank_bvn || messages.bank_bvn"
+                    class="block mt-1 w-full"
+                    id="bvn"
+                    label="Bank Verification Number (BVN)*"
+                    type="number"
+                    min="1"
+                    @input="$v.form.bank_bvn.$touch"
+                    @blur="$v.form.bank_bvn.$touch"
+                    v-model.trim="form.bank_bvn"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1">
+              <div class="flex flex-col md:flex-row">
+                <div class="w-full flex-1 flex flex-col justify-end">
+                  <jet-label target="account-opening-date"
+                    >Account Opening Date
+                    <jet-required />
+                  </jet-label>
+                  <jet-month-picker
+                    v-model="bank_opening_date"
+                    @blur="$v.bank_opening_date.$touch"
+                    @input="$v.bank_opening_date.$touch"
+                    :max-date="new Date()"
+                    :no-default="true"
+                    :show-year="true"
+                    :input-class="{
+                      'border-red-500 border rounded block mt-1 w-full py-3 px-4 mb-3 leading-tight focus:outline-none bg-gray-200 focus:bg-white shadow-sm text-gray-700':
+                        errors.bank_opening_date || messages.bank_opening_date,
+                      'border rounded block mt-1 w-full py-3 px-4 mb-3 leading-tight focus:outline-none bg-gray-200 focus:bg-white shadow-sm text-gray-700': !(
+                        errors.bank_opening_date || messages.bank_opening_date
+                      )
+                    }"
+                    name="bank_opening_date"
+                  />
+                  <jet-input-error
+                    :message="
+                      errors.bank_opening_date || messages.bank_opening_date
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab_wrap" style="display: none">
+          <div class="tab_content grid gap-6">
+            <template>
+              <span class="text-gray-600 text-sm">
+                Upload your Signature mandate, Passport photograph and Means of
+                identification. Only images (.jpeg, .jpg, .png) accepted. File
+                size must not exceed 300kb.
+              </span>
+            </template>
+            <jet-section-border class="col-span-2" />
+            <input
+              @change="updatePassportPreview"
+              class="hidden"
+              ref="passport"
+              id="passport"
+              accept="image/jpeg,image/png,image/webp"
+              type="file"
+            />
+            <input
+              @change="updateSignature1Preview"
+              class="hidden"
+              ref="signature1"
+              id="signature1"
+              accept="image/jpeg,image/png,image/webp"
+              type="file"
+            />
+            <input
+              @change="updateSignature2Preview"
+              class="hidden"
+              ref="signature2"
+              id="signature2"
+              accept="image/jpeg,image/png,image/webp"
+              type="file"
+            />
+            <input
+              @change="updateCompanySealPreview"
+              class="hidden"
+              ref="company_seal"
+              id="company-seal"
+              accept="image/jpeg,image/png,image/webp"
+              type="file"
+            />
+            <input
+              @change="updateIdentityPreview"
+              class="hidden"
+              ref="identity"
+              id="identity"
+              accept="image/jpeg,image/png,image/webp"
+              type="file"
+            />
+            <div
+              class="col-span-2"
+              v-for="doc in documents || []"
+              :key="doc.id"
+            >
+              <div
+                class="max-w-sm max-w-full lg:flex border rounded"
+                :class="{
+                  'border-red-700': form.error(doc.type) || messages[doc.type],
+                  'border-gray-400': !form.error(doc.type)
+                }"
+              >
+                <div
+                  v-if="doc.preview"
+                  class="
+              h-32
+              lg:h-auto
+              lg:w-32
+              flex-none
+              lg:rounded-l
+              text-center
+              overflow-hidden
+            "
+                >
+                  <img
+                    :src="doc.preview"
+                    :alt="doc.name"
+                    class="object-cover w-32 h-32"
+                  />
+                </div>
+                <div
+                  class="p-4 flex flex-col flex-grow justify-center leading-normal"
+                >
+                  <div class="mb-4">
+                    <div class="text-gray-900 font-bold text-md break-all">
+                      {{ doc.title || doc.name }}
+                      <jet-required v-if="!doc.notRequired" />
+                    </div>
+                    <span class="text-sm">
+                      {{ doc.hint }}
+                    </span>
+                  </div>
+                  <div class="flex items-center mb-3">
+                    <jet-secondary-button
+                      @click.native.prevent="doc.uploadHandler"
+                      class="mt-2 mr-2"
+                      type="button"
+                    >
+                      Select {{ doc.name }}
+                    </jet-secondary-button>
+                    <jet-secondary-button
+                      v-if="doc.notRequired && doc.preview"
+                      @click.native.prevent="doc.removeHandler"
+                      class="mt-2 bg-red-200"
+                      type="button"
+                    >
+                      <i class="fa fa-trash-alt text-red-700" />
+                    </jet-secondary-button>
+                  </div>
+                  <div v-if="doc.is_downloadable" class="flex items-center">
+                    <a
+                      :href="'/storage/' + doc.document_path"
+                      target="_blank"
+                      class="
+                  inline-flex
+                  items-center
+                  px-4
+                  py-2
+                  bg-white
+                  border border-gray-300
+                  rounded-md
+                  font-semibold
+                  text-xs text-gray-700
+                  uppercase
+                  tracking-widest
+                  shadow-sm
+                  hover:text-gray-500
+                  focus:outline-none
+                  focus:border-blue-300
+                  focus:shadow-outline-blue
+                  active:text-gray-800
+                  active:bg-gray-50
+                  transition
+                  ease-in-out
+                  duration-150
+                  mt-2
+                  mr-2
+                "
+                    >
+                      Preview
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <jet-input-error
+                :message="form.error(doc.type) || messages[doc.type]"
+                class="mt-2 left"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <jet-section-border class="col-span-2" />
+    </template>
+
+    <template #actions>
+      <jet-action-message
+        :on="form.recentlySuccessful"
+        class="mr-3"
+        v-if="showTabAndContent"
+      >
+        Submitted.
+      </jet-action-message>
+
+      <jet-button :loading="form.processing" v-if="showTabAndContent">
+        Submit
+      </jet-button>
+    </template>
+
+    <template #table>
+      <div class="table-cont">
+        <p class="mb-4 text-center text-sm text-gray-600">
+          &bull; Please tick the applicable company
+        </p>
+        <table
+          v-if="!resetting"
+          class="border-collapse table-auto w-full text-left"
+        >
+          <thead>
+            <tr class="text-left">
+              <th></th>
+              <th class="px-3">Name of Company</th>
+              <th class="px-3">
+                <span class="text-sm">Shareholder's <br />Account Number</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(company, index) in companies" :key="company.id">
+              <td class="border">
+                <div class="block flex items-center justify-center px-1">
+                  <jet-checkbox
+                    :disabled="form.processing"
+                    class="form-checkbox"
+                    type="checkbox"
+                    v-model="company.check"
+                    :checked="company.check"
+                    @input="
+                      checked => {
+                        company.check = checked;
+                        if (!checked) {
+                          company.account_number = '';
+                        }
+                        form.companies = companies
+                          .filter(c => c.check)
+                          .map(c => ({
+                            company_id: c.id,
+                            account_number: c.account_number || ''
+                          }));
+                      }
+                    "
+                  />
+                </div>
+              </td>
+              <td class="border px-3">{{ company.name }}</td>
+              <td class="border">
+                <jet-input
+                  :disabled="form.processing"
+                  :error="errors['companies.' + index + '.account_number']"
+                  class="block w-full"
+                  @input="
+                    val => {
+                      company.check = !!company.account_number;
+
+                      form.companies = companies
+                        .filter(c => c.check)
+                        .map(c => ({
+                          company_id: c.id,
+                          account_number: c.account_number || ''
+                        }));
+                    }
+                  "
+                  :id="'company-' + company.id"
+                  label="Account Number"
+                  type="number"
+                  min="1"
+                  slim
+                  v-model.trim="company.account_number"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <jet-input-error :message="messages.companies" class="mt-3 left" />
+
+      <!-- No Email Modal -->
+      <jet-dialog-modal :show="noEmail" @close="noEmail = false" max-width="sm">
+        <template #content>
+          <div
+            class="
+              flex flex-wrap
+              sm:flex-no-wrap
+              justify-between
+              bg-white
+              rounded
+              overflow-hidden
+              p-2
+              space-x-0
+              sm:space-x-2
+            "
+          >
+            <div
+              class="
+                flex flex-1
+                sm:flex-initial
+                justify-center
+                items-baseline
+                py-4
+                sm:py-0
+              "
+            >
+              <span class="bg-orange-300 bg-opacity-50 rounded-full p-1">
+                <svg
+                  class="fill-current h-6 w-6 text-orange-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"
+                  />
+                </svg>
+              </span>
+            </div>
+            <div class="flex flex-col flex-grow text-center md:text-left">
+              <h1 class="font-medium leading-relaxed md:leading-normal">
+                Missing email address
+              </h1>
+              <p class="leading-tight mt-3 text-sm text-gray-600">
+                You will not receive notifications without filling your email
+                address, proceed?
+              </p>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <jet-secondary-button @click.native="noEmail = false">
+            No
+          </jet-secondary-button>
+          <jet-button
+            class="ml-3"
+            @click.native="
+              proceedWithoutEmail = true;
+              noEmail = false;
+              submit();
+            "
+          >
+            Yes
+          </jet-button>
+        </template>
+      </jet-dialog-modal>
+
+      <!-- Success Modal -->
+      <jet-dialog-modal
+        :show="success"
+        @close="
+          success = false;
+          form.reset();
+        "
+        max-width="sm"
+      >
+        <template #content>
+          <div
+            class="
+              flex flex-wrap
+              sm:flex-no-wrap
+              justify-between
+              bg-white
+              rounded
+              overflow-hidden
+              p-2
+              space-x-0
+              sm:space-x-2
+            "
+          >
+            <div
+              class="
+                flex flex-1
+                sm:flex-initial
+                justify-center
+                items-baseline
+                py-4
+                sm:py-0
+              "
+            >
+              <span class="bg-green-300 bg-opacity-50 rounded-full p-1">
+                <svg
+                  class="h-10 sm:h-6 w-auto text-green-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </span>
+            </div>
+            <div class="flex flex-col flex-grow text-center md:text-left">
+              <h1 class="font-medium leading-relaxed md:leading-normal">
+                Your details have been submitted for processing
+              </h1>
+              <p class="leading-tight mt-3 text-sm text-gray-600">
+                Your account will be mandated once the submitted details are
+                verified and approved.
+              </p>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <jet-secondary-button @click.native="success = false">
+            Close
+          </jet-secondary-button>
+        </template>
+      </jet-dialog-modal>
+    </template>
+  </jet-form-section>
+</template>
+
+<script>
+import axios from 'axios';
+import dayjs from 'dayjs';
+import {
+  email,
+  maxLength,
+  maxValue,
+  minLength,
+  required,
+  requiredIf,
+  requiredUnless
+} from 'vuelidate/lib/validators';
+import { schemas } from '@/constants';
+import { handleUpdateResponse } from '@/helpers';
+
+export default {
+  props: {
+    errors: {
+      type: Object,
+      default() {
+        return {};
+      }
+    },
+    banks: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    companies: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    countries: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    nigerian_states: {
+      type: Array,
+      default() {
+        return [];
+      }
+    }
+  },
+  data() {
+    return {
+      dateFormat: 'DD-MM-YYYY',
+      bank_opening_date: null,
+      showTabAndContent: false,
+      success: false,
+      resetting: false,
+      proceedWithoutEmail: false,
+      noEmail: false,
+      states: this.nigerian_states || [],
+      cities: [],
+      form: this.$inertia.form(
+        {
+          ...schemas.basic,
+          companies: []
+        },
+        {
+          resetOnSuccess: true
+        }
+      ),
+      documents: {},
+      sizes: {
+        identity: 0,
+        passport: 0,
+        signature1: 0,
+        signature2: 0,
+        company_seal: 0
+      }
+    };
+  },
+
+  validations: {
+    bank_opening_date: {
+      from: {
+        required,
+        maxValue: maxValue(
+          dayjs()
+            .subtract(6, 'month')
+            .toDate()
+        )
+      }
+    },
+    sizes: {
+      identity: { maxValue: maxValue(300000) },
+      passport: { maxValue: maxValue(300000) },
+      signature1: { maxValue: maxValue(300000) },
+      signature2: { maxValue: maxValue(300000) },
+      company_seal: { maxValue: maxValue(300000) }
+    },
+    form: {
+      type: {
+        required
+      },
+      bank_name: {
+        required
+      },
+      bank_account_name: {
+        required
+      },
+      bank_account_number: {
+        required,
+        minLength: minLength(10),
+        maxLength: maxLength(10)
+      },
+      bank_bvn: {
+        required,
+        minLength: minLength(11),
+        maxLength: maxLength(11)
+      },
+      bank_short_code: {
+        required
+      },
+      bank_opening_date: {
+        required
+      },
+      surname: {
+        required
+      },
+      first_name: {
+        required: requiredUnless(function() {
+          return this.isCorporate;
+        })
+      },
+      address1: {
+        required
+      },
+      city: {
+        required
+      },
+      state: {
+        required
+      },
+      country: {
+        required
+      },
+      phone1: {
+        required
+      },
+      email: {
+        email
+      },
+      passport: {
+        required: requiredIf(function() {
+          return this.isIndividual;
+        })
+      },
+      signature1: {
+        required
+      },
+      signature2: {
+        required: requiredIf(function() {
+          return this.isCorpOrJoint;
+        })
+      },
+      identity: {
+        required: requiredIf(function() {
+          return this.isIndividual;
+        })
+      }
+    }
+  },
+  computed: {
+    isIndividual() {
+      return this.form.type === 'IND' || !this.form.type;
+    },
+    isCorporate() {
+      return this.form.type === 'CORP' || !this.form.type;
+    },
+    isJoint() {
+      return this.form.type === 'JOINT' || !this.form.type;
+    },
+    isCorpOrJoint() {
+      return this.isCorporate || this.isJoint;
+    },
+    messages() {
+      const messages = {};
+      if (this.$v.form.type.$dirty && this.$v.form.type.$invalid) {
+        messages['type'] = 'This is required';
+      }
+      if (this.$v.form.bank_name.$dirty && this.$v.form.bank_name.$invalid) {
+        messages['bank_name'] = 'This is required';
+      }
+      if (
+        this.$v.form.bank_account_name.$dirty &&
+        this.$v.form.bank_account_name.$invalid
+      ) {
+        messages['bank_account_name'] = 'This is required';
+      }
+      if (
+        this.$v.form.bank_account_number.$dirty &&
+        this.$v.form.bank_account_number.$invalid
+      ) {
+        if (this.$v.form.bank_account_number.minLength) {
+          messages[
+            'bank_account_number'
+          ] = `Account number must be at most ${this.$v.form.bank_account_number.$params.minLength.min} numbers`;
+        } else if (this.$v.form.bank_account_number.maxLength) {
+          messages[
+            'bank_account_number'
+          ] = `Account number must be at least ${this.$v.form.bank_account_number.$params.maxLength.max} numbers`;
+        } else {
+          messages['bank_account_number'] = 'This is required';
+        }
+      }
+      if (this.$v.form.bank_bvn.$dirty && this.$v.form.bank_bvn.$invalid) {
+        if (this.$v.form.bank_bvn.minLength) {
+          messages[
+            'bank_bvn'
+          ] = `BVN must be at most ${this.$v.form.bank_bvn.$params.minLength.min} numbers`;
+        } else if (this.$v.form.bank_bvn.maxLength) {
+          messages[
+            'bank_bvn'
+          ] = `BVN must be at least ${this.$v.form.bank_bvn.$params.maxLength.max} numbers`;
+        } else {
+          messages['bank_bvn'] = 'This is required';
+        }
+      }
+      if (
+        this.$v.form.bank_short_code.$dirty &&
+        this.$v.form.bank_short_code.$invalid
+      ) {
+        messages['bank_short_code'] = 'This is required';
+      }
+      if (
+        this.$v.bank_opening_date.from.$dirty &&
+        this.$v.bank_opening_date.from.$invalid
+      ) {
+        if (!this.$v.bank_opening_date.from.maxValue) {
+          messages[
+            'bank_opening_date'
+          ] = `Bank account must be older than six (6) months`;
+        } else {
+          messages['bank_opening_date'] = 'This is required';
+        }
+      }
+      if (this.$v.form.surname.$dirty && this.$v.form.surname.$invalid) {
+        messages['surname'] = 'This is required';
+      }
+      if (this.$v.form.first_name.$dirty && this.$v.form.first_name.$invalid) {
+        messages['first_name'] = 'This is required';
+      }
+      if (this.$v.form.address1.$dirty && this.$v.form.address1.$invalid) {
+        messages['address1'] = 'This is required';
+      }
+      if (this.$v.form.city.$dirty && this.$v.form.city.$invalid) {
+        messages['city'] = 'This is required';
+      }
+      if (this.$v.form.state.$dirty && this.$v.form.state.$invalid) {
+        messages['state'] = 'This is required';
+      }
+      if (this.$v.form.country.$dirty && this.$v.form.country.$invalid) {
+        messages['country'] = 'This is required';
+      }
+      if (this.$v.form.phone1.$dirty && this.$v.form.phone1.$invalid) {
+        messages['phone1'] = 'This is required';
+      }
+      if (this.$v.form.email.$dirty && this.$v.form.email.$invalid) {
+        messages['email'] = 'A valid email is required';
+      }
+
+      if (this.$v.form.passport.$dirty && this.$v.form.passport.$invalid) {
+        messages['passport'] = 'This is required';
+      }
+      if (this.$v.form.signature1.$dirty && this.$v.form.signature1.$invalid) {
+        messages['signature1'] = 'This is required';
+      }
+      if (this.$v.form.signature2.$dirty && this.$v.form.signature2.$invalid) {
+        messages['signature2'] = 'This is required';
+      }
+      if (this.$v.form.identity.$dirty && this.$v.form.identity.$invalid) {
+        messages['identity'] = 'This is required';
+      }
+
+      if (this.$v.sizes.passport.$dirty && !this.$v.sizes.passport.maxValue) {
+        messages['passport'] = 'Maximum file size is 300kb';
+      }
+
+      if (
+        this.$v.sizes.signature1.$dirty &&
+        !this.$v.sizes.signature1.maxValue
+      ) {
+        messages['signature1'] = 'Maximum file size is 300kb';
+      }
+
+      if (
+        this.$v.sizes.signature2.$dirty &&
+        !this.$v.sizes.signature2.maxValue
+      ) {
+        messages['signature2'] = 'Maximum file size is 300kb';
+      }
+
+      if (this.$v.sizes.identity.$dirty && !this.$v.sizes.identity.maxValue) {
+        messages['identity'] = 'Maximum file size is 300kb';
+      }
+
+      if (
+        this.$v.sizes.company_seal.$dirty &&
+        !this.$v.sizes.company_seal.maxValue
+      ) {
+        messages['company_seal'] = 'Maximum file size is 300kb';
+      }
+
+      return messages;
+    }
+  },
+  mounted() {
+    this.tabAction();
+  },
+  methods: {
+    tabAction() {
+      let tabs = document.querySelectorAll('.tabs ul li');
+      let tab_wraps = document.querySelectorAll('.tab_wrap');
+
+      tabs.forEach(function(tab, tab_index) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(tab) {
+            tab.classList.remove('active');
+          });
+          tab.classList.add('active');
+
+          tab_wraps.forEach(function(content, content_index) {
+            if (content_index == tab_index) {
+              content.style.display = 'block';
+            } else {
+              content.style.display = 'none';
+            }
+          });
+        });
+      });
+    },
+    async submit() {
+      this.$v.$touch();
+
+      if (this.$v.$invalid) {
+        this.$notify({
+          group: 'root',
+          type: 'info',
+          title: 'Validation error',
+          text: 'Some required fields are missing'
+        });
+        return;
+      }
+
+      if (!this.form.email && !this.proceedWithoutEmail) {
+        this.noEmail = true;
+        return;
+      }
+
+      this.proceedWithoutEmail = false;
+
+      this.form
+        .post(this.route('store'), {
+          preserveScroll: true
+        })
+        .then(() => {
+          if (!this.form.hasErrors()) {
+            this.success = true;
+            this.form.companies = [];
+            this.form.country = 'Nigeria';
+            this.form.country_id = 160;
+            this.resetting = true;
+            this.companies
+              .filter(c => c.check)
+              .forEach(company => {
+                company.account_number = '';
+                company.check = false;
+              });
+            setTimeout(() => {
+              this.resetting = false;
+            }, 200);
+            this.bank_opening_date = null;
+            this.$refs.passport.value = null;
+            this.$refs.signature1.value = null;
+            this.$refs.signature2.value = null;
+            this.$refs.company_seal.value = null;
+            this.$refs.identity.value = null;
+            this.sizes = {
+              identity: 0,
+              passport: 0,
+              signature1: 0,
+              signature2: 0,
+              company_seal: 0
+            };
+            this.$v.$reset();
+          }
+        })
+        .then(() =>
+          handleUpdateResponse(this, {
+            text: 'E-Dividend Mandate form submitted.'
+          })
+        );
+    },
+
+    log(val) {
+      console.log(val);
+    },
+
+    selectNewPassport() {
+      this.$refs.passport.click();
+    },
+
+    selectNewSignature1() {
+      this.$refs.signature1.click();
+    },
+
+    selectNewSignature2() {
+      this.$refs.signature2.click();
+    },
+
+    selectNewCompanySeal() {
+      this.$refs.company_seal.click();
+    },
+
+    removeCompanySeal() {
+      this.$refs.company_seal.value = null;
+      this.form.company_seal = null;
+      this.documents.company_seal.preview = null;
+      this.sizes.company_seal = 0;
+    },
+
+    selectNewIdentity() {
+      this.$refs.identity.click();
+    },
+
+    updatePassportPreview() {
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        this.documents.passport.preview = e.target.result;
+        this.form.passport = this.$refs.passport.files[0];
+        this.sizes.passport = this.form.passport.size;
+        this.$v.sizes.passport.$touch();
+      };
+
+      if (this.$refs.passport.files[0]) {
+        reader.readAsDataURL(this.$refs.passport.files[0]);
+      }
+    },
+
+    updateSignature1Preview() {
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        this.documents.signature1.preview = e.target.result;
+        this.form.signature1 = this.$refs.signature1.files[0];
+        this.sizes.signature1 = this.form.signature1.size;
+        this.$v.sizes.signature1.$touch();
+      };
+
+      if (this.$refs.signature1.files[0]) {
+        reader.readAsDataURL(this.$refs.signature1.files[0]);
+      }
+    },
+
+    updateSignature2Preview() {
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        this.documents.signature2.preview = e.target.result;
+        this.form.signature2 = this.$refs.signature2.files[0];
+        this.sizes.signature2 = this.form.signature2.size;
+        this.$v.sizes.signature2.$touch();
+      };
+
+      if (this.$refs.signature2.files[0]) {
+        reader.readAsDataURL(this.$refs.signature2.files[0]);
+      }
+    },
+
+    updateCompanySealPreview() {
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        this.documents.company_seal.preview = e.target.result;
+        this.form.company_seal = this.$refs.company_seal.files[0];
+        this.sizes.company_seal = this.form.company_seal.size;
+        this.$v.sizes.company_seal.$touch();
+      };
+
+      if (this.$refs.company_seal.files[0]) {
+        reader.readAsDataURL(this.$refs.company_seal.files[0]);
+      }
+    },
+
+    updateIdentityPreview() {
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        this.documents.identity.preview = e.target.result;
+        this.form.identity = this.$refs.identity.files[0];
+        this.sizes.identity = this.form.identity.size;
+        this.$v.sizes.identity.$touch();
+      };
+
+      if (this.$refs.identity.files[0]) {
+        reader.readAsDataURL(this.$refs.identity.files[0]);
+      }
+    },
+
+    async onCountryChange(id) {
+      this.form.country_id = id;
+      this.form.country = this.countries.find(c => `${c.id}` === id).name;
+      this.form.state_id = '';
+      this.form.state = '';
+      this.form.city_id = '';
+      this.form.city = '';
+      this.form.processing = true;
+      try {
+        const response = await axios.get(
+          this.route('states', { country: this.form.country_id })
+        );
+
+        this.states = response.data || [];
+      } catch (e) {
+        this.$notify({
+          group: 'root',
+          type: 'warn',
+          title: 'Error',
+          text: 'Could not fetch states, try again'
+        });
+      }
+      this.form.processing = false;
+    },
+
+    async onStateChange(id) {
+      this.form.state_id = id;
+      this.form.city_id = '';
+      this.form.city = '';
+      if (id !== 'others') {
+        this.form.state = this.states.find(c => `${c.id}` === id).name;
+        this.form.processing = true;
+        try {
+          const response = await axios.get(
+            this.route('cities', { state: this.form.state_id })
+          );
+
+          this.cities = response.data || [];
+        } catch (e) {
+          this.$notify({
+            group: 'root',
+            type: 'warn',
+            title: 'Error',
+            text: 'Could not fetch cities, try again'
+          });
+        }
+        this.form.processing = false;
+      } else {
+        this.form.state = '';
+        this.cities = [];
+        this.form.city_id = 'others';
+        this.form.city = '';
+      }
+    },
+
+    async onCityChange(id) {
+      this.form.city_id = id;
+      if (id !== 'others') {
+        this.form.city = this.cities.find(c => `${c.id}` === id).name;
+      } else {
+        this.form.city = '';
+      }
+    }
+  },
+
+  watch: {
+    companies: {
+      handler(val) {
+        this.form.companies.forEach(company => {
+          this.companies.some(c => {
+            const found = c.id === company.company_id;
+            if (found) {
+              c.check = true;
+              c.account_number = company.account_number;
+            }
+
+            return found;
+          });
+        });
+      }
+    },
+    'bank_opening_date.from': {
+      handler(val) {
+        this.form.bank_opening_date = this.$options.filters.moment(
+          val,
+          this.dateFormat
+        );
+      }
+    },
+    'form.bank_short_code': {
+      handler(val) {
+        if (val) {
+          const bank = this.banks.find(bank => bank.code === val);
+          this.form.bank_code = bank['longCode'];
+        } else {
+          this.form.bank_code = '';
+        }
+      }
+    },
+    'form.type': {
+      handler(val) {
+        if (val) {
+          this.showTabAndContent = true;
+        }
+        this.$refs.passport.value = null;
+        this.$refs.signature1.value = null;
+        this.$refs.signature2.value = null;
+        this.$refs.company_seal.value = null;
+        this.$refs.identity.value = null;
+
+        this.form.passport = null;
+        this.form.signature1 = null;
+        this.form.signature2 = null;
+        this.form.company_seal = null;
+        this.form.identity = null;
+
+        this.sizes = {
+          identity: 0,
+          passport: 0,
+          signature1: 0,
+          signature2: 0,
+          company_seal: 0
+        };
+
+        if (val === 'CORP') {
+          this.documents = {
+            passport: {
+              name: 'Passport',
+              title: 'Passport Photograph',
+              type: 'passport',
+              uploadHandler: this.selectNewPassport,
+              preview: null
+            },
+            signature1: {
+              name: 'Signature Mandate 1',
+              type: 'signature1',
+              uploadHandler: this.selectNewSignature1,
+              preview: null
+            },
+            signature2: {
+              name: 'Signature Mandate 2',
+              type: 'signature2',
+              uploadHandler: this.selectNewSignature2,
+              preview: null
+            },
+            company_seal: {
+              title: 'Company Seal (if applicable)',
+              name: 'Company Seal',
+              type: 'company_seal',
+              uploadHandler: this.selectNewCompanySeal,
+              removeHandler: this.removeCompanySeal,
+              preview: null,
+              notRequired: true
+            }
+          };
+        } else if (val === 'JOINT') {
+          this.documents = {
+            passport: {
+              name: 'Passport',
+              title: 'Passport Photograph',
+              type: 'passport',
+              uploadHandler: this.selectNewPassport,
+              preview: null
+            },
+            signature1: {
+              name: 'Signature Mandate 1',
+              type: 'signature1',
+              uploadHandler: this.selectNewSignature1,
+              preview: null
+            },
+            signature2: {
+              name: 'Signature Mandate 2',
+              type: 'signature2',
+              uploadHandler: this.selectNewSignature2,
+              preview: null
+            }
+          };
+        } else {
+          this.documents = {
+            passport: {
+              name: 'Passport',
+              title: 'Passport Photograph',
+              type: 'passport',
+              uploadHandler: this.selectNewPassport,
+              preview: null
+            },
+            signature1: {
+              name: 'Signature Mandate',
+              type: 'signature1',
+              uploadHandler: this.selectNewSignature1,
+              preview: null
+            },
+            identity: {
+              name: 'Means of Identification',
+              type: 'identity',
+              uploadHandler: this.selectNewIdentity,
+              preview: null,
+              hint:
+                "National Identity Card, Driver's License, Permanent Voter's Card and International Passport"
+            }
+          };
+        }
+
+        this.$v.$reset();
+      }
+    }
+  }
+};
+</script>
+
+<style scoped>
+* {
+  list-style: none;
+  font-family: 'Montserrat', sans-serif;
+}
+.tabs ul {
+  display: flex;
+  background: #fbfbfb;
+  margin-bottom: 25px;
+}
+
+.tabs ul li {
+  padding: 15px;
+  color: #3b3b3b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tabs ul li .icon {
+  font-size: 20px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.tabs ul li:last-child {
+  border-right: 0px;
+}
+
+.tabs ul li:before {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-bottom: 2px solid #323979 !important;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.tabs ul li:hover,
+.tabs ul li.active {
+  color: #323979;
+}
+
+.tabs ul li:hover:before,
+.tabs ul li.active:before {
+  opacity: 1;
+}
+
+.table-cont {
+  height: 720px;
+  overflow: scroll;
+}
+</style>
